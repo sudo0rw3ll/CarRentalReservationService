@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 
@@ -31,7 +30,7 @@ public class ReservationServiceImplementation implements ReservationService {
     public Page<ReservationDto> findAll(Pageable pageable) {
         return (Page<ReservationDto>) reservationRepository
                 .findAll(pageable)
-                .map(reservationMapper::reservationToReservationDto);
+                .map(reservationMapper::scheduleToScheduleDto);
     }
 
     @Override
@@ -39,8 +38,8 @@ public class ReservationServiceImplementation implements ReservationService {
         return  reservationRepository
                 .findAll().stream()
                 .filter(reservation -> reservation.getCompany().getAddress().getCity().equals(city_name))
-                .map(reservationMapper::reservationToReservationDto)
-                .collect(Collectors.toList());
+                .map(reservationMapper::scheduleToScheduleDto)
+                .toList();
     }
 
 
@@ -50,8 +49,8 @@ public class ReservationServiceImplementation implements ReservationService {
         return reservationRepository
                 .findAll().stream()
                 .filter(reservation -> reservation.getCompany().getName().equals(company_name))
-                .map(reservationMapper::reservationToReservationDto)
-                .collect(Collectors.toList());
+                .map(reservationMapper::scheduleToScheduleDto)
+                .toList();
 
     }
 
@@ -60,8 +59,8 @@ public class ReservationServiceImplementation implements ReservationService {
         return reservationRepository.findAll().stream()
                 .filter(reservation -> ( (reservation.getStarting_date().isAfter(start_date) || reservation.getStarting_date().isEqual(start_date))
                 || (reservation.getEnding_date().isEqual(end_date) || reservation.getEnding_date().isBefore(end_date))))
-                .map(reservationMapper::reservationToReservationDto)
-                .collect(Collectors.toList());
+                .map(reservationMapper::scheduleToScheduleDto)
+                .toList();
 
     }
 }
