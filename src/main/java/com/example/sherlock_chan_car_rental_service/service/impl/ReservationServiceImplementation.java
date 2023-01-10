@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 
@@ -30,7 +31,7 @@ public class ReservationServiceImplementation implements ReservationService {
     public Page<ReservationDto> findAll(Pageable pageable) {
         return (Page<ReservationDto>) reservationRepository
                 .findAll(pageable)
-                .map(reservationMapper::scheduleToScheduleDto);
+                .map(reservationMapper::reservationToReservationDto);
     }
 
     @Override
@@ -38,8 +39,8 @@ public class ReservationServiceImplementation implements ReservationService {
         return  reservationRepository
                 .findAll().stream()
                 .filter(reservation -> reservation.getCompany().getAddress().getCity().equals(city_name))
-                .map(reservationMapper::scheduleToScheduleDto)
-                .toList();
+                .map(reservationMapper::reservationToReservationDto)
+                .collect(Collectors.toList());
     }
 
 
@@ -49,18 +50,19 @@ public class ReservationServiceImplementation implements ReservationService {
         return reservationRepository
                 .findAll().stream()
                 .filter(reservation -> reservation.getCompany().getName().equals(company_name))
-                .map(reservationMapper::scheduleToScheduleDto)
-                .toList();
+                .map(reservationMapper::reservationToReservationDto)
+                .collect(Collectors.toList());
 
     }
 
     @Override
     public List<ReservationDto> findByDate(LocalDate start_date, LocalDate end_date) {
         return reservationRepository.findAll().stream()
-                .filter(reservation -> ( (reservation.getStarting_date().isAfter(start_date) || reservation.getStarting_date().isEqual(start_date))
-                || (reservation.getEnding_date().isEqual(end_date) || reservation.getEnding_date().isBefore(end_date))))
-                .map(reservationMapper::scheduleToScheduleDto)
-                .toList();
+                .filter(reservation -> ( (start_date.isAfter(reservation.getStarting_date()) ||
+                        start_date.isEqual(reservation.getStarting_date()))
+                && (end_date.isEqual(reservation.getEnding_date()) || (end_date).isBefore(reservation.getEnding_date()))))
+                .map(reservationMapper::reservationToReservationDto)
+                .collect(Collectors.toList());
 
     }
 }
